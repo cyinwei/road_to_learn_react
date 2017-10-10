@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import './App.css'
 
-const pst = [
+const list = [
   {
     title: 'React',
     url: 'https://facebook.github.io/react/',
@@ -19,11 +19,28 @@ const pst = [
     objectID: 1,
   }
 ]
+
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.onDismiss = this.onDismiss.bind(this)
+    this.state = {
+      list
+    }
+  }
+
+  onDismiss(id) {
+    let updated = this.state.list.filter(site =>
+      id !== site.objectID)
+
+    this.setState({
+      list: updated
+    })
+  }
   render() {
     return (
       <div className='App'>
-        {pst.map(site =>
+        {this.state.list.map(site =>
           <div key={site.objectID}>
             <h3><a href={site.url}>{site.title}</a></h3>
               <p>
@@ -35,6 +52,10 @@ class App extends Component {
               <p>
                 {site.points}
               </p>
+              <button onClick={() => this.onDismiss(site.objectID)}
+                      type='button'>
+                dismiss.
+              </button>
           </div>
          )}       
       </div>

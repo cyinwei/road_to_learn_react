@@ -1,0 +1,63 @@
+#+TITLE: Notes from Road to Learn React
+* Introduction to React
+** Using lists
+   We need a key for 
+** ES6
+*** Functions
+    #+BEGIN_SRC js
+    // this a standard function:
+    const sum = function(a, b) {
+      return a + b
+    }
+
+    // es6 arrow function
+    const sum = (a, b) => {
+      return a + b
+    }
+
+    // without braces, the expr is the return
+    const sum = (a, b) =>
+      a + b
+
+    // don't need parenthesis if we have one input variable
+    const abs = a =>
+      (a < 0)? a : -a
+    #+END_SRC
+*** Objects
+    #+BEGIN_SRC js
+    /*
+     * Object in ES5 go by
+     * var obj = {
+     *   property: value
+     * }
+     */
+    
+    // in ES6 we can shorthand initializers like this
+    const obj = {
+      list: list // notice the property and value keys are the same
+    }
+
+    const obj = {
+      list
+    }
+
+    // in ES6 we can shorthand functions like this
+    const obj = {
+      prop: function(a) {
+        return a
+      }
+    }
+
+    const obj = {
+      prop(a) {
+        return a
+      }
+    }
+
+    // Can also use computed property names
+    const name = 'charlie'
+    const obj = {
+      [name]: 'a baller'
+    }
+    #+END_SRC
+* Basics in React
