@@ -76,4 +76,66 @@
            type='button'>
      dismiss
    </button>
+   // notice the react prop onClick, which takes in a function to handle an
+   //  synthetic event.  We don't use it here (we just pass in objectID, but...
+
+   // our button onClick handler, which just prunes our list.
+   // NOTE: pattern: every function that sets state needs to be in the React class
+   //  and binded (to use this)
+   onDismiss(id) {
+     let updated = this.state.list.filter(site =>
+       id !== site.objectID)
+
+     this.setState({
+       list: updated
+     })
+   }  // remember to bind in constructor to use this
+   #+END_SRC
+** Client search bar
+   #+BEGIN_SRC js
+   // first we need to add a form
+   // <App> ...
+   <form>
+     <input type='text'
+                 onChange={this.onSearchChange}/>
+   </form>
+   // notice that we have the react onChange prop to pass in a function handler
+   //  the function takes in an syntheic event
+
+   // the onChange handler, which takes in a synthetic event
+   onSearchChange(event) {
+    this.setState({ searchTerm: event.target.value })
+   }
+
+   // be sure to to update our state to include searchTerm and bind this   
+   constructor(props) {
+    super(props)
+    this.state = {
+      list,
+      searchTerm : ''
+    }
+    this.onDismiss = this.onDismiss.bind(this)
+    this.onSearchChange = this.onSearchChange.bind(this)
+   }
+
+   // to 'search' we apply a filter to our list like this:
+   // list.filter(isSearched).map(ourComponents)
+   {this.state.list.filter(isSearched(this.state.searchTerm)).map(site =>
+     <div key={site.objectID}>
+        <h3><a href={site.url}>{site.title}</a></h3>
+         <p>
+           Author: {site.author}
+         </p>
+         {/*more data components here*/}
+      </div>
+
+   // our filter needs a filter to filter with.  We could have an internal function (bind this for state)
+   // or use a higher order function (we do this :) )
+   const isSearched = (searchTerm) =>
+     (site) => {
+       return !searchTerm.trim() || 
+         site.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         site.author.toLowerCase().includes(searchTerm.toLowerCase())
+   }
+   // note the initial !searchTerm is to detect an empty string, so we match everything
    #+END_SRC
