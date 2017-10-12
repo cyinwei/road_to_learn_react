@@ -20,13 +20,22 @@ const list = [
   }
 ]
 
+const isSearched = (searchTerm) =>
+  (site) => {
+    return !searchTerm.trim() || 
+           site.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           site.author.toLowerCase().includes(searchTerm.toLowerCase())
+  }
+
 class App extends Component {
   constructor(props) {
     super(props)
-    this.onDismiss = this.onDismiss.bind(this)
     this.state = {
-      list
+      list,
+      searchTerm : ''
     }
+    this.onDismiss = this.onDismiss.bind(this)
+    this.onSearchChange = this.onSearchChange.bind(this)
   }
 
   onDismiss(id) {
@@ -37,10 +46,21 @@ class App extends Component {
       list: updated
     })
   }
+
+  onSearchChange(event) {
+    this.setState({ searchTerm: event.target.value })
+    console.log(event)
+    console.log(event.target.value)
+  }
+
   render() {
     return (
       <div className='App'>
-        {this.state.list.map(site =>
+        <form>
+          <input type='text'
+                 onChange={this.onSearchChange}/>
+        </form>
+        {this.state.list.filter(isSearched(this.state.searchTerm)).map(site =>
           <div key={site.objectID}>
             <h3><a href={site.url}>{site.title}</a></h3>
               <p>
@@ -63,4 +83,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default App

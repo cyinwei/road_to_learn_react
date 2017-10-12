@@ -23,6 +23,7 @@
     const abs = a =>
       (a < 0)? a : -a
     #+END_SRC
+
 *** Objects
     #+BEGIN_SRC js
     /*
@@ -60,4 +61,19 @@
       [name]: 'a baller'
     }
     #+END_SRC
+
 * Basics in React
+** Button onClick
+   #+BEGIN_SRC js
+   // need to bind this for class functions
+   constructor(props) {
+     // ...
+     this.onDismiss = this.onDismiss.bind(this)
+   }
+
+   // ...
+   <button onClick={() => this.onDismiss(site.objectID)}
+           type='button'>
+     dismiss
+   </button>
+   #+END_SRC
