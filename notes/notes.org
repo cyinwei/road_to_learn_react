@@ -1,7 +1,7 @@
 #+TITLE: Notes from Road to Learn React
 * Introduction to React
 ** Using lists
-   We need a key for 
+   We need a key in order to work with JS lists (list -> JSX elem) so React knows when to update the individual nodes.
 ** ES6
 *** Functions
     #+BEGIN_SRC js
@@ -24,7 +24,7 @@
       (a < 0)? a : -a
     #+END_SRC
 
-*** Objects
+*** Objects Definitions
     #+BEGIN_SRC js
     /*
      * Object in ES5 go by
@@ -58,10 +58,25 @@
     // Can also use computed property names
     const name = 'charlie'
     const obj = {
-      [name]: 'a baller'
+      [name]: 'a baller' // evaluates to 'charlie' : 'a baller'
     }
     #+END_SRC
 
+*** Object destructuring
+    #+BEGIN_SRC js
+    // remember in python you could do
+    // (hi, python_rocks) = list_or_tuple # ?
+
+    // you can do that with es6 now
+    {hi, jsRocksToo} = obj
+
+    // useful in functional stateless components
+    const Component = (props) =>
+      <div> {props.xD} </div>
+
+    const Component = ({xD}) =>
+      <div> {xd} </div>
+    #+END_SRC
 * Basics in React
 ** Button onClick
    #+BEGIN_SRC js
@@ -97,7 +112,8 @@
    // <App> ...
    <form>
      <input type='text'
-                 onChange={this.onSearchChange}/>
+            onChange={this.onSearchChange}
+     />
    </form>
    // notice that we have the react onChange prop to pass in a function handler
    //  the function takes in an syntheic event
@@ -139,3 +155,20 @@
    }
    // note the initial !searchTerm is to detect an empty string, so we match everything
    #+END_SRC
+** Controlled components
+   Certain =<html>= components have their own state, like =<form>= elements (=<input>=, =<textarea>=, =<select>=).  We want React's state to be the single source of truth, so we add an =value= prop to the =<input>= like so.
+
+   #+BEGIN_SRC js
+   <form>
+    <input
+      type='text'
+      value={value}
+      onChange={onChange}
+    />
+   </form>
+   #+END_SRC
+** Composable Components
+   I know this.
+** Reusable Components
+   CLOSED: [2017-10-12 Thu 20:23]
+   I know this.
