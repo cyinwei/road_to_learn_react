@@ -168,7 +168,58 @@
    </form>
    #+END_SRC
 ** Composable Components
-   I know this.
+   I know this.  You can create Components from other Components.  Kind of like calling function within a function.
 ** Reusable Components
    CLOSED: [2017-10-12 Thu 20:23]
-   I know this.
+   I know this.  You can reuse Components, kind of a like a library function.
+** Component Declarations
+   Currently there are two types of Components:
+   - Functional Stateless Components
+     - Don't have state within them (no =this.state=)
+     - Defined as a function
+     - Serves as a view component (basically the render method)
+   - Class Components
+     - Holds state
+     - Defined as a class
+     - Serves as state management
+** Styling Components
+   Without 3rd party libs (Styled Components), React comes with two ways to do styling: inline and imported pure CSS.
+
+   #+BEGIN_SRC js
+   // inline styling
+   <h1 style={{color: 'red'}}>
+     This is a RED header.
+   </h1>
+   #+END_SRC
+   
+   That's inline styling.
+
+   #+BEGIN_SRC css
+   /* ex.css */
+   body {
+     color: #222;
+     background: aquamarine;
+   }
+
+   .ayy {
+     color: orange;
+   }
+   #+END_SRC
+
+   Then just do:
+   #+BEGIN_SRC js
+   // jsx file
+   import 'ex.css'
+   #+END_SRC
+
+   Some tips and tricks I learned from copy-writing Robin's CSS.
+   - "Cards" are just =div= elements with a =border= and =background= color.
+   - Buttons should have a =cursor=, and we can change the color by using =button:hover= tag.
+   - Containers (=div=) like cards need to have a margin.
+     - Padding is space inside of the border (bigger cards)
+     - Margin is space outisde of the border (wider spaced cards)
+     - *Vertical margins* collapse!
+       - That means if two vertical margins touch each other, the values collapse into the largest value.
+         - Can fix this by adding invisible padding or just something inbetween the margins
+         - Ex: 2 divs, margin 30px and 20px touching.  We'd expect a space of 50px between them, but the space is 30px.
+   - Flexbox is the defactor layout engine right now, at least for smaller components (Cards) in 1D.

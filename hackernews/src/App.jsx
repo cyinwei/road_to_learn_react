@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import './App.css'
+import './App.css'
 
 const list = [
   {
@@ -33,21 +33,25 @@ const Search = ({value, onChange}) =>
       type='text'
       value={value}
       onChange={onChange}
+      style={{width: '50%'}}
     />
   </form>
 
 const Table = ({list, pattern, onDismiss}) =>
-  <div>
+  <div classname="table">
     {list.filter(isSearched(pattern)).map(site =>
-      <div key={site.objectID}>
-        <h3><a href={site.url}>{site.title}</a></h3>
-        <p>{site.author}</p>
-        <p>{site.num_comments} comments</p>
-        <p>{site.points}</p>          
+      <div key={site.objectID} className="table-row">
+        <h3 className="table-text" style={{width: '40%'}}>
+          <a href={site.url}>{site.title}</a>
+        </h3>
+        <p style={{width: '30%'}}>{site.author}</p>
+        <p style={{width: '10%'}}>{site.num_comments} comments</p>
+        <p style={{width: '10%'}}>{site.points}</p>
         <Button
           onClick={() => onDismiss(site.objectID)}
-        >
-          dismiss.
+          className="button-inline table-text"
+          >
+            dismiss
         </Button>
       </div>
      )}  
@@ -89,11 +93,16 @@ class App extends Component {
   }
 
   render() {
-    return <div>
-      <Search 
-        value={this.state.searchTerm}
-        onChange={this.onSearchChange}
-      />
+    return <div className="page">
+      <div className="interactions">
+        <Search 
+          value={this.state.searchTerm}
+          onChange={this.onSearchChange}
+        >
+          Search
+        </Search>
+      </div>
+     
       <Table
         list={this.state.list}
         pattern={this.state.searchTerm}
