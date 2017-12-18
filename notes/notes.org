@@ -194,7 +194,7 @@
    
    That's inline styling.
 
-   #+BEGIN_SRC css
+   #+BEGIN_SRC
    /* ex.css */
    body {
      color: #222;
@@ -223,3 +223,60 @@
          - Can fix this by adding invisible padding or just something inbetween the margins
          - Ex: 2 divs, margin 30px and 20px touching.  We'd expect a space of 50px between them, but the space is 30px.
    - Flexbox is the defactor layout engine right now, at least for smaller components (Cards) in 1D.
+* Getting Real with an API
+** Lifecycle Methods
+*** Mounting (prerender)
+**** =constructor()=
+     Initialize state to get off the ground or just to the loading screen.  We also bind =this= here.
+**** =componentWillMount()= 
+     Don't use this usually.
+**** =render()=
+     Think of this as a pure function.  No state should change.  Like a functional stateless component.
+**** =componentDidMount()=
+     *Useful*.  After the graphics are rendered (no lag), we then can make API calls to update state here.
+*** Update lifecycle (after initial render, before shutdown)
+**** =componentWillReceiveProps(nextProps)= 
+     Used to apply different behavior when props changes (during an update lifecycle).  We can do things like changing internal state based on different props.  [Setting new state based on nextProps is the thing to do here].  Similar to the constructor, where we set state.
+**** =shouldComponentUpdate(nextProps, nextState)=
+     Called *every* time a component will update based on props or state.  Used for optimization (render children or nah? or disable the update lifecycle of a child).
+**** =componentWillUpdate(nextProps, nextState)=
+     Similar to =componentWillMount()=, don't usually use this, unless we're cleaning or doing calculations before the render().  NOTE: Can't change the state (=setState()=) anymore.  We'll use =componentWillReceiveProps()= for that.
+**** =render()=
+     The render part of the update lifecycle, so the graphics change.  Again, should be pure.
+**** =componentDidUpdate(prevProps, prevState)=
+     Similar to =componentDidMount()=, we can do API calls, update state, (or access the DOM) here.  Think asynchronous actions.
+*** Unmount
+**** =componentWillUnmount()=
+     Bascially the deconstructor.  Think C++ delete.  Free resources (that the garbage collector doesn't immediately touch) and such.  Unsubscribing remote connections makes sense here.
+** Fetching Data
+** ES6 Spread Operators (Copying Objects)
+
+   Spread operators is basically unpacking arrays or objects (state 3 proposal es6).  Like the python =*= syntax.
+
+   There's quick hack we can use object spread operators to make a 1st level deep copy.
+   #+BEGIN_SRC js
+   // ES5 Object Copying [1 level deep]
+   this.setState({
+     result: Object.assign({}, this.state.result, { hits: updatedHits}) 
+   })
+   /* From MDN:
+    * Object.assign(target, ...sources)
+    * Properties in the target object will be overwritten by properties in the sources if they have the same key. 
+    * Later sources' properties will similarly overwrite earlier ones.  
+    */
+
+    // ES6 Spread Syntax Object Copying [1 level deep]
+    this.setState({
+      result: { ...this.state.result, hits: updatedHits }
+    })
+    /* Notice how the new result takes the unpacked properties of the old result (...this.state.result),
+     * and then takes a property with the same over which overrides it's old property in the list.
+     * This way, we get a new copy of state without altering the old state.
+     */
+   #+END_SRC
+
+** Conditional Rendering
+** Client or Server Side Search
+** Paginated Fetch
+** Client Cache
+* Code Organization and Testing
