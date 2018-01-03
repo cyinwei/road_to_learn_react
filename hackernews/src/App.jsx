@@ -20,14 +20,17 @@ const isSearched = (searchTerm) =>
            site.author.toLowerCase().includes(searchTerm.toLowerCase())
   }
 
-const Search = ({value, onChange}) =>
-  <form>
+const Search = ({children, value, onChange, onSubmit}) =>
+  <form onSubmit={onSubmit}>
     <input
       type='text'
       value={value}
       onChange={onChange}
       style={{width: '50%'}}
     />
+    <button type="submit">
+      {children}
+    </button>
   </form>
 
 const overflowStyle = {
@@ -83,6 +86,7 @@ class App extends Component {
     this.setSearchTopStories = this.setSearchTopStories.bind(this)
     this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this)
     this.onSearchChange = this.onSearchChange.bind(this)
+    this.onSearchSubmit = this.onSearchSubmit.bind(this)
     this.onDismiss = this.onDismiss.bind(this)
   }
 
@@ -103,8 +107,15 @@ class App extends Component {
   }
 
   onSearchChange(event) {
-    console.log(event)
+    console.log('READ', event.target)
     this.setState({searchTerm: event.target.value})
+  }
+
+  onSearchSubmit(event) {
+    const {searchTerm} = this.state
+    console.log(searchTerm)
+    this.fetchSearchTopStories(searchTerm)
+    event.preventDefault() // need this to prevent the refresh of the page
   }
 
   onDismiss(id) {
@@ -131,6 +142,7 @@ class App extends Component {
         <Search 
           value={this.state.searchTerm}
           onChange={this.onSearchChange}
+          onSubmit={this.onSearchSubmit}
         >
           Search
         </Search>

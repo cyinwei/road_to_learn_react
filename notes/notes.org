@@ -331,4 +331,12 @@
 
    In React, we can use conditional rendering to show different components based on state (so a loading screen when data isn't there yet).
 
+** Client or Server Side Search
+
+   On the client side, we can manipulate the state returned from the Algolia API with the filter.  This is named 'client side search'.  However, we want to use the search bar to get new state from Algolia.  That's 'server side search', since we're querying Algolia.
+
+   To do that, we can retool the search bar for server side search.  We're going to add a button to our search bar, and connect the search function to the =<form onSubmit={fn}=.
+
+   HTML forms work a bit differently in React since we wanted a single source of state (see []
+
 * Code Organization and Testing
