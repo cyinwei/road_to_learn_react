@@ -248,12 +248,47 @@
 *** Unmount
 **** =componentWillUnmount()=
      Bascially the deconstructor.  Think C++ delete.  Free resources (that the garbage collector doesn't immediately touch) and such.  Unsubscribing remote connections makes sense here.
+
 ** Fetching Data
+
+   To fetch data, we use the =fetch()= method, brought in 2015 to replace AJAX requests (see [[https://davidwalsh.name/fetch][here]] for history and basic usage).
+
+   Basically, we can =fetch()= an URI, like an API request, and it'll return a =Promise=, when we can call functions on to do stuff asynchronously with the data.
+
+   #+BEGIN_SRC js
+   // fetch Hacker News stories from Algolia
+   function fetchTopSearchStories(searchTerm) {
+     fetch(getUri(searchTerm) // simple string interpolation for https://...
+       .then(response => response.json()) // returns a Request object
+       .then(result => this.setData(result))
+       .catch(e => e)
+
+   /* notice the functions act as a dataflow on the async. callback from the
+    * fetch.
+    * also: you can pass headers and other params? in the fetch request.
+    */
+   #+END_SRC
+
+   Note: call these async loaders in the =componentDidMount()= state, which is right after the initial UI loads.  That way the user can see a loading state and the UI is snappy.
+
+*** String Interpolation
+    Quick aside:
+
+    #+BEGIN_SRC js
+    const jsVar = 'three'
+    const is_in = 'one'
+    const here = 'two'
+
+    string = `{${jsVar} = ${is_in} + ${here}}`
+    // string is 'three = one + two'
+    #+END_SRC
+
 ** ES6 Spread Operators (Copying Objects)
 
    Spread operators is basically unpacking arrays or objects (state 3 proposal es6).  Like the python =*= syntax.
 
    There's quick hack we can use object spread operators to make a 1st level deep copy.
+
    #+BEGIN_SRC js
    // ES5 Object Copying [1 level deep]
    this.setState({
@@ -276,7 +311,24 @@
    #+END_SRC
 
 ** Conditional Rendering
-** Client or Server Side Search
-** Paginated Fetch
-** Client Cache
+
+   React is just Javascript.  So we can do a simple =if else= statement to render components based on a boolean value.
+
+   Note React will render *nothing at all* if you return a bool (True, False, null) in the =render()=
+
+   To look fancier, we can use the ternary syntax from C: =bool? doThisIfTrue : doThisIfFalse=.
+
+   #+BEGIN_SRC js
+   // two different methods
+
+   // in a render() method of a component ...
+   {if (this.state.loaded) {
+     return <CoolData>
+   } else return <p> Loading ... </p>}
+
+   {this.state.loaded? <CoolData> : <p> Loading ... </p>
+   #+END_SRC
+
+   In React, we can use conditional rendering to show different components based on state (so a loading screen when data isn't there yet).
+
 * Code Organization and Testing

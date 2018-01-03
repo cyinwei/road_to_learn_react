@@ -30,6 +30,11 @@ const Search = ({value, onChange}) =>
     />
   </form>
 
+const overflowStyle = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'
+}
+
 const Table = ({list, pattern, onDismiss}) =>
   <div className="table">
     {list.filter(isSearched(pattern)).map(site =>
@@ -37,10 +42,16 @@ const Table = ({list, pattern, onDismiss}) =>
         <h3 className="table-text" style={{width: '40%'}}>
           <a href={site.url}>{site.title}</a>
         </h3>
-        <p style={{width: '30%'}}>{site.author}</p>
-        <p style={{width: '10%'}}>{site.num_comments} comments</p>
-        <p style={{width: '10%'}}>{site.points}</p>
-        <Button
+        <p style={{width: '30%', ...overflowStyle}}>
+          {site.author}
+        </p>
+        <p style={{width: '10%', ...overflowStyle}}>
+          {site.num_comments} comments
+        </p>
+        <p style={{width: '10%', ...overflowStyle}}>
+          {site.points}
+        </p>
+        <Button style={overflowStyle}
           onClick={() => onDismiss(site.objectID)}
           className="button-inline table-text"
         >
@@ -83,7 +94,10 @@ class App extends Component {
     fetch(generateUrl(searchTerm), {
       mode: 'cors'
     })
-      .then(response => response.json())
+      .then(response => {
+        console.log(response)
+        return response.json()}
+      )
       .then(result => this.setSearchTopStories(result))
       .catch(e => e)
   }
