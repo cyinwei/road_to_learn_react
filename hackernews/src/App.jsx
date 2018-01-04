@@ -11,15 +11,6 @@ const url = `${BASE_PATH}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}`
 const generateUrl = (searchTerm) =>
   `${BASE_PATH}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`
 
-console.log(url)
-
-const isSearched = (searchTerm) =>
-  (site) => {
-    return !searchTerm.trim() || // '' -> return all values
-           site.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           site.author.toLowerCase().includes(searchTerm.toLowerCase())
-  }
-
 const Search = ({children, value, onChange, onSubmit}) =>
   <form onSubmit={onSubmit}>
     <input
@@ -40,7 +31,7 @@ const overflowStyle = {
 
 const Table = ({list, pattern, onDismiss}) =>
   <div className="table">
-    {list.filter(isSearched(pattern)).map(site =>
+    {list.map(site =>
       <div key={site.objectID} className="table-row">
         <h3 className="table-text" style={{width: '40%'}}>
           <a href={site.url}>{site.title}</a>
@@ -107,15 +98,14 @@ class App extends Component {
   }
 
   onSearchChange(event) {
-    console.log('READ', event.target)
     this.setState({searchTerm: event.target.value})
   }
 
   onSearchSubmit(event) {
     const {searchTerm} = this.state
-    console.log(searchTerm)
     this.fetchSearchTopStories(searchTerm)
     event.preventDefault() // need this to prevent the refresh of the page
+    // which will reset the state (so searchTerm == DEFAULT_QUERY)
   }
 
   onDismiss(id) {
@@ -150,7 +140,6 @@ class App extends Component {
       { result ?
         <Table
           list={this.state.result.hits}
-          pattern={this.state.searchTerm}
           onDismiss={this.onDismiss}
         />
         :

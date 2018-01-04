@@ -335,8 +335,58 @@
 
    On the client side, we can manipulate the state returned from the Algolia API with the filter.  This is named 'client side search'.  However, we want to use the search bar to get new state from Algolia.  That's 'server side search', since we're querying Algolia.
 
-   To do that, we can retool the search bar for server side search.  We're going to add a button to our search bar, and connect the search function to the =<form onSubmit={fn}=.
+   To do that, we can retool the search bar for server side search.  We're going to add a button to our search bar, and connect the search function to the =<form onSubmit={fn}>=.  Note that by doing so, we drop the filter client side search entirely.
 
-   HTML forms work a bit differently in React since we wanted a single source of state (see []
+   HTML forms work a bit differently in React since we wanted a single source of state (see [[https://reactjs.org/docs/forms.html][the React Documentation on Forms]].).  That means for server side search, we can include a ="submit"= button in the form and query when we do.  We can also do debouncing, a technique that waits for the user to stop typing before firing off an API request.  [[https://levelup.gitconnected.com/debounce-in-javascript-improve-your-applications-performance-5b01855e086][Gitconnected explains here.]]  That's kind of hard, so we're gonna go with a simple =submit= button.
+
+   #+BEGIN_SRC js
+   /* Basically, we attach an onSubmit() prop to the form and type the button as
+    * a submit button.  In this case, we make another API call based on the
+    * searchTerm, which just repeats the function in componentDidMount().
+    */
+
+
+   // in <Search> ...
+   const Search = ({children, value, onChange, onSubmit}) => {
+     return (
+       <form onSubmit={onSubmit}> {/* fetch the API call onSubmit */}
+         <input
+           value={value} {/* match the React state, which is searchTerm */}
+           onChange={onChange} {/* update the React state on every change */}
+         />
+         <button type="submit">
+           {children}
+         </button>
+       </form>
+     )
+   }
+
+   // in <App> ...
+   constructor(props) {
+     // ...
+     // remember to bind this
+     this.onSearchSubmit = this.onSearchSubmit.bind(this)
+   }
+   
+   onSearchSubmit(event) {
+     event.preventDefault() // on normal form submits, the webpage does a refresh
+     // causing us to reset the state (back to a redux searchTerm)
+
+     {searchTerm} = this.state
+     this.fetchTopStories(searchTerm)
+   }
+   render() {
+     // ...
+     <Search
+       value={this.state.searchTerm}
+       onChange={this.onSearchChange}
+       onSubmit={this.onSearchSubmit}
+     >
+       Search
+     </Search>
+   }
+   #+END_SRC
+
+** Paginated Fetch
 
 * Code Organization and Testing
