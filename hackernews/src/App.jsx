@@ -7,7 +7,6 @@ const BASE_PATH = 'https://hn.algolia.com/api/v1'
 const PATH_SEARCH = '/search'
 const PARAM_SEARCH = 'query='
 
-const url = `${BASE_PATH}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}`
 const generateUrl = (searchTerm) =>
   `${BASE_PATH}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`
 
@@ -126,11 +125,10 @@ class App extends Component {
 
   render() {
     const { searchTerm, result } = this.state
-    console.log(result)
     return <div className="page">
       <div className="interactions">
         <Search 
-          value={this.state.searchTerm}
+          value={searchTerm}
           onChange={this.onSearchChange}
           onSubmit={this.onSearchSubmit}
         >
