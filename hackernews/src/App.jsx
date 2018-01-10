@@ -74,7 +74,8 @@ class App extends Component {
     this.state = {
       results: null,
       searchTerm: DEFAULT_QUERY,
-      searchKey: ''
+      searchKey: '',
+      error: null
     }
 
     // binding this
@@ -123,6 +124,7 @@ class App extends Component {
     .then(result => this.setSearchTopStories(result))
     .catch(e => {
       console.log('error:', e)
+      this.setState({ error: e.message})
     })
   }
 
@@ -162,7 +164,7 @@ class App extends Component {
   }
 
   render() {
-    const { searchTerm, searchKey, results } = this.state
+    const { searchTerm, searchKey, results, error } = this.state
     const page = (results && results[searchKey]
                   && results[searchKey].page) || 0
     const list = (results && results[searchKey]
@@ -179,7 +181,12 @@ class App extends Component {
           Search
         </Search>
       </div>
-      { list.length !== 0 ?
+      { 
+        error ?
+        <p style={{textAlign: 'center'}}>
+          {error}
+        </p>
+        :list.length !== 0 ?
         <div className="interactions">
           <Table
             list={list}
