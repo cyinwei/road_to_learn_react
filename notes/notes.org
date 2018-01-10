@@ -388,5 +388,9 @@
    #+END_SRC
 
 ** Paginated Fetch
-
+  How do we get the entire search results set from the HN Algolia API?.  To do that, we notice that the API returns an =nbHits= and =page=
+** Client Cache
+*** Cross Origin Resource Sharing
+    I had to deal with
+** Error Handling
 * Code Organization and Testing
