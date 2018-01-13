@@ -387,10 +387,218 @@
    }
    #+END_SRC
 
-** Paginated Fetch
-  How do we get the entire search results set from the HN Algolia API?.  To do that, we notice that the API returns an =nbHits= and =page=
+** Paginated Fetch (API changes, adding a 'More' button)
+   How do we get the entire search results set from the HN Algolia API?.  To do that, we notice that the API returns an =nbHits=, =hitsPerPage= and =page= parameter, lets us grab more results.  We can mirror that functionality within our app.
+
+   First, we add the params to our HTTP API call.
+   #+BEGIN_SRC js
+   const BASE_PATH = 'https://hn.algolia.com/api/v1'
+   const PATH_SEARCH = '/search'
+   const QUERY_PARAM = 'query'
+   const PAGE_PARAM = 'page'
+   const HPP_PARAM = 'hitsPerPage'
+
+   const generateUrl = (searchTerm, page) =>
+     `${BASE_PATH}${PATH_SEARCH}?${QUERY_PARAM}=${searchTerm}&\
+${PAGE_PARAM}=${page}&${HPP_PARAM}=${DEFAULT_HPP}`
+   #+END_SRC
+
+   The initial page is page 0, and we need a page state for our current  =searchTerm=.
+
+   #+BEGIN_SRC js
+   // In <App> ...
+   constructor(props) {
+     super(props)
+     this.state = {
+       searchTerm : 'redux',
+       result: null, // now result has a page state to check on the current page
+     }
+   }
+   #+END_SRC
+
+   We fetch data in =fetchSearchTopStories()=, so we'll add an *default parameter* like so:
+
+   #+BEGIN_SRC js
+   // In <App> ...
+   fetchSearchTopStories(searchTerm, page = 0) {
+     fetch(...)
+   }  // now page will default to 0, just like Python or C++
+   #+END_SRC
+
+   Now to move onto the next page, we can add a =More= button, calling =fetchSearchTopStories(searchTerm, page+1)=.
+
+   #+BEGIN_SRC js
+   // In <App>'s render() ...
+   { searchTerm, page } = this.state
+
+   // ...
+   <Button 
+     onClick={() => this.fetchSearchTopStories(searchTerm, page+1)}
+   >
+     More        
+   </Button>
+   #+END_SRC
+
+   Note that we need to change our =result= state to include the new page.  We set the result in =setSearchTopStories()=, so we can use the spread operator to unpack the old results and update to the new results.
+
+   #+BEGIN_SRC js
+   setSearchTopStories(result) {
+   const { hits, page } = result;
+   const oldHits = page !== 0
+     ? this.state.result.hits
+     : [];
+   const updatedHits = [
+     ...oldHits,
+     ...hits
+   ];
+   this.setState({
+     result: { hits: updatedHits, page }
+   });
+   #+END_SRC
+   
 ** Client Cache
+
+   The key here is to separate the API fetch with what the current =searchTerm= or =searchKey=.  I conflated the two and ran into some problems implementing this by myself.
+
+*** Make the visual state purely dependent on the searchKey
+
+    The idea here is for the =<Table>= component to display results *only* on based on =searchKey=.  That means anytime we =setState({searchKey})=, we see somthing different.  That way, we can store old =result= calls from Algolia, and use searchKey as a key into the hashmap.  That means we turn a single =result= into multiple =results=.
+
+    #+BEGIN_SRC js
+    // in <App> ...
+    constructor(props) {
+      super(props)
+      this.state = {
+        results: null,
+        searchTerm: 'redux',
+        searchKey: '',
+      }
+    } /* NOTE: the page state gets put within the results[searchKey] object */
+    #+END_SRC
+
+    When do we change the visual state?  In the search bar, when we first load, the =more= button, and the =dismiss= button.
+
+    In particular let's focus on the initial load and the search bar.
+
+    Notice that both the initial state (=componentDidMount()=) and the search bar =onSearchSubmit()= both call =fetchSearchTopStories()=, which calls =setSearchTopStories()=.  We might be tempted to go straight to the source and refactor =setSearchTopStories= to create the cache (=results=), check for updates, and all that.
+
+    Don't do that.  (I did that and ran into state troubles).  That's overloading the function.  We should first tie the visual state to =searchKey=.
+
+    #+BEGIN_SRC js
+    // in <App>'s render() ...
+    render() {
+      const hits = (results && results[searchKey] && results[searchKey].hits) ||
+                   []
+      /* Notice the use of logical shortcircuiting to see if results cache isn't
+       * null, then the individual result (results[searchKey]), and then we grab
+       * the hits.  We shortcircuit to an empty list if any of them are null or
+       * undefined (Javascript... empty arrays are True cause they objects...)
+       */
+
+      // ...
+      <Table list={hits} /* ... */ />
+    #+END_SRC
+
+    Now anytime we set state on =searchKey=, the table will change.
+
+*** Accessing state for =componentDidMount()= and =onSearchSubmit()=
+
+    Now, we can just call =setState({searchKey})= for each of the entry functions (We could put that into the =setSearchTopStores()= to be honest, but Robin didn't do that... ).
+
+    #+BEGIN_SRC js
+    componentDidMount() {
+      const { searchTerm } = this.state;
+      this.setState({ searchKey: searchTerm });
+      this.fetchSearchTopStories(searchTerm);
+    }
+    onSearchSubmit(event) {
+      const { searchTerm } = this.state;
+      this.setState({ searchKey: searchTerm });
+      this.fetchSearchTopStories(searchTerm);
+      event.preventDefault();
+    }
+    #+END_SRC
+
+*** Updating =setSearchTopStories()=, or updating the state to store multiple results
+    
+    Now that our state is a multiple object hash, we need to update how we =setState()= on it, which is primarily in =setSearchTopStories()=.  Notice the usage of shortcircuiting again to deal with nonexistent objects (Swift pls), and the dynamic object names.  Thanks ES6.
+
+    #+BEGIN_SRC js
+    setSearchTopStories(result) {
+      const { hits, page } = result // from the API
+      const { searchKey, results } = this.state
+
+      const oldHits = results && results[searchKey]
+        ? results[searchKey].hits
+        : []
+                   
+      const updatedHits = [
+        ...oldHits,
+        ...hits
+      ]
+   
+      this.setState({
+        results: {
+          ...results,
+          [searchKey] : {hits: updatedHits, page},
+        },
+        searchKey
+      })
+    }
+    #+END_SRC
+
+*** Updating =onDismiss()= and the =More= button
+    
+    For the more button, we don't need to do anything, because =fetchSearchTopStories()= calls the updated =setSearchTopStories()=, which works just fine.  Notice by separating state based on searchKey, the other functions don't need much refactoring. 
+
+    The =dismiss= button needs to access the new =states= object.
+    
+    #+BEGIN_SRC js
+    onDismiss(id) {
+      const { searchKey, results } = this.state
+      const { hits, page } = results[searchKey]
+      const updatedHits = hits.filter((item) => {
+        return item.objectID !== id
+      })
+
+      this.setState({
+        results: {
+          ...results,
+          [searchKey]: { hits: updatedHits, page},
+        }
+      })
+    }
+    #+END_SRC
+   
 *** Cross Origin Resource Sharing
-    I had to deal with
+    I had to deal with stupid error because I put a ='cors'= tag in the fetch HTTP header.  Don't do that.  Also, CORS headers is set from the *server side*, not client side.  Don't touch the fetch HTTP headers for now.
+
 ** Error Handling
+
+   We can display errors in the fetch before the loading segment.
+
+   #+BEGIN_SRC js
+   fetchSearchTopStories(searchTerm, page=0) {
+     fetch(generateUrl(searchTerm, page))
+     .then(response => {
+       return response.json()
+     })
+     .then(result => this.setSearchTopStories(result))
+     .catch(e => {
+       console.log('error:', e)
+       this.setState({ error: e.message })
+     })
+   }
+
+   // then just display
+   render() {
+     return (
+      // ...
+      error ? <p>{error}</p>
+            : // ...
+     )
+   }
+   #+END_SRC
+
 * Code Organization and Testing
+** ES6 Modules: Import and Export

@@ -124,7 +124,7 @@ class App extends Component {
     .then(result => this.setSearchTopStories(result))
     .catch(e => {
       console.log('error:', e)
-      this.setState({ error: e.message})
+      this.setState({ error: e.message })
     })
   }
 
@@ -169,8 +169,6 @@ class App extends Component {
                   && results[searchKey].page) || 0
     const list = (results && results[searchKey]
                   && results[searchKey].hits) || []
-    console.log(page)
-    console.log(list)
     return <div className="page">
       <div className="interactions">
         <Search 
