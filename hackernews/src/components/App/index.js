@@ -1,71 +1,14 @@
 import React, { Component } from 'react'
-import './App.css'
+import './index.css'
 
-const DEFAULT_QUERY = 'redux'
-const DEFAULT_HPP = 100
+import {
+  DEFAULT_QUERY,
+  generateUrl
+} from '../../constants'
 
-const BASE_PATH = 'https://hn.algolia.com/api/v1'
-const PATH_SEARCH = '/search'
-const QUERY_PARAM = 'query'
-const PAGE_PARAM = 'page'
-const HPP_PARAM = 'hitsPerPage'
-
-const generateUrl = (searchTerm, page) =>
-  `${BASE_PATH}${PATH_SEARCH}?${QUERY_PARAM}=${searchTerm}&\
-${PAGE_PARAM}=${page}&${HPP_PARAM}=${DEFAULT_HPP}`
-
-const Search = ({children, value, onChange, onSubmit}) =>
-  <form onSubmit={onSubmit}>
-    <input
-      type='text'
-      value={value}
-      onChange={onChange}
-      style={{width: '50%'}}
-    />
-    <button type="submit">
-      {children}
-    </button>
-  </form>
-
-const overflowStyle = {
-  overflow: 'hidden',
-  textOverflow: 'ellipsis'
-}
-
-const Table = ({list, pattern, onDismiss}) =>
-  <div className="table">
-    {list.map(site =>
-      <div key={site.objectID} className="table-row">
-        <h3 className="table-text" style={{width: '40%'}}>
-          <a href={site.url}>{site.title}</a>
-        </h3>
-        <p style={{width: '30%', ...overflowStyle}}>
-          {site.author}
-        </p>
-        <p style={{width: '10%', ...overflowStyle}}>
-          {site.num_comments} comments
-        </p>
-        <p style={{width: '10%', ...overflowStyle}}>
-          {site.points}
-        </p>
-        <Button style={overflowStyle}
-          onClick={() => onDismiss(site.objectID)}
-          className="button-inline table-text"
-        >
-          dismiss
-        </Button>
-      </div>
-     )}  
-  </div>
-
-const Button = ({children, onClick, className}) =>
-  <button
-    type="button"
-    className={className}
-    onClick={onClick}
-  >
-    {children}
-  </button>
+import Search from '../Search'
+import Table from '../Table'
+import Button from '../Button'
 
 class App extends Component {
   constructor(props) {

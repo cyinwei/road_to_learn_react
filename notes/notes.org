@@ -602,3 +602,65 @@ ${PAGE_PARAM}=${page}&${HPP_PARAM}=${DEFAULT_HPP}`
 
 * Code Organization and Testing
 ** ES6 Modules: Import and Export
+   
+   How to we think about code?  In different chunks.  Here's how ES6 does module [objects, functions, variables, constants] import and exports.
+
+   The default way to import and export is to export an object with the keys corresponding to the 'variables' you want to export.
+
+   #+BEGIN_SRC js
+   // file1.js
+   const hi = 'hi'
+   const bye = 'bye'
+
+   export { hi, bye}
+
+   // file2.js
+   import { hi, bye } from 'file1.js' // notice the ES6 object destructuring?
+   #+END_SRC
+
+   Like Python3, you can rename the things you import with the =as= syntax.  This is useful for importing the entire object.
+
+   #+BEGIN_SRC js
+   // file3.js
+   import * as greetings from 'file1.js'
+   console.log(greetings.hi, greetings.bye) // 'hi bye'
+   #+END_SRC
+
+*** Default Exports
+    
+    Don't want to import a giant object?  Or do you just want to export *one* variable?  Use =default export=.  /NOTE: Who ever imports the =default export= can name it *whatever* they want./
+
+    #+BEGIN_SRC js
+    // file4.js
+    const charlie = {
+      first: 'charlie',
+      last: 'zhang'
+    }
+
+    export default charlie
+
+    // file5.js
+    import whoisthis from 'file4.js' // name the variable ANYTHING
+    console.log(whoisthis.first) // 'charlie'
+    #+END_SRC
+    
+    
+** Code Organization with ES6 Modules
+
+   The method Robin recomments is to have a component folder, which subfolders representing each component.  The =index.js= file in each component folder will be the 'header/interface' file where we expose the component.
+
+   #+BEGIN_EXAMPLE
+   # in 'app'
+   /components
+     /App
+       /index.js
+       /test.js
+       /index.css # and so on
+     /Button
+       /index.js
+       /SubmitButton.js # which index.js will expose
+     ...
+   #+END_EXAMPLE
+
+   By doing so, we *do not* have to include the =.js= extension when we import a file.  We instead import the folder, from which ES6 will find the =index.js= to use.  Think of =index.js= as an interface/header or public API for other modules to consume.
+** Snapshot Testing with Jest
